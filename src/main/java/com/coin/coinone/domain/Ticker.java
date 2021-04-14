@@ -11,5 +11,4 @@ public class Ticker {
     private String low;
     private String last;
     private String volume;
-
 }

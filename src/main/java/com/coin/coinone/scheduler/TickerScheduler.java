@@ -23,5 +23,6 @@ public class TickerScheduler {
         Trigger trigger = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule("* /1 * * * ?")).build();
 
         scheduler.scheduleJob(job,trigger);
+
     }
 }

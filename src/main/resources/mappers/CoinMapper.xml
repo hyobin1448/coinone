@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.neo.myhome.dao.MusicDao"><!--namespace를 통해 UserDAO와 연결합니다. -->
+
+
+    <select id="searchCoinList" resultType="com.coin.coinone.domain.Coin">
+        SELECT key, name, deal FROM COIN_TABLE
+    </select>
+    <insert id="insertItem" parameterType="com.coin.coinone.domain.Coin">
+        INSERT INTO coin_table
+        (`key`, `name`,`deal`)
+        VALUES
+        ('#{key}', '${name}','1')
+    </insert>
+
+</mapper>

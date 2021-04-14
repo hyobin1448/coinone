@@ -6,4 +6,5 @@ import lombok.Data;
 public class Coin {
     private String key;
     private String name;
+    private String deal;
 }

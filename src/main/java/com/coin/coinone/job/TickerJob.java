@@ -1,9 +1,13 @@
 package com.coin.coinone.job;
 
+import com.coin.coinone.domain.Coin;
 import com.coin.coinone.domain.Ticker;
 import com.coin.coinone.scheduler.TickerScheduler;
+import com.coin.coinone.service.CoinService;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
@@ -15,21 +19,21 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Component
 public class TickerJob implements Job {
+    private ApplicationContext ctx;
+    @Autowired
+    private CoinService service;
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException{
-        sendGet();
+        ctx = (ApplicationContext)jobExecutionContext.getJobDetail().getJobDataMap().get("applicationContext");
+        service = (CoinService)ctx.getBean("CoinService");
+        List<Coin> list = service.searchCoinList();
+        String a = "";
+//        sendGet();
 //        sendPost();
-        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-        Scheduler scheduler = null;
-        try {
-            scheduler = schedulerFactory.getScheduler();
-            scheduler.shutdown();
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
     }
     private void sendGet(){
         try {
