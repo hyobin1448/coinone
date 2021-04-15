@@ -2,13 +2,16 @@ package com.coin.coinone.job;
 
 import com.coin.coinone.domain.Coin;
 import com.coin.coinone.domain.Ticker;
-import com.coin.coinone.scheduler.TickerScheduler;
+import com.coin.coinone.domain.TickerList;
 import com.coin.coinone.service.CoinService;
+import com.google.gson.Gson;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -16,32 +19,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
 @Component
-public class TickerJob implements Job {
+@EnableAsync
+public class TickerJob {
     private ApplicationContext ctx;
     @Autowired
     private CoinService service;
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException{
-        ctx = (ApplicationContext)jobExecutionContext.getJobDetail().getJobDataMap().get("applicationContext");
-        service = (CoinService)ctx.getBean("CoinService");
+    @Scheduled(cron = "* */1 * * * ?")
+    @Async
+    public void start() throws JobExecutionException{
+
         List<Coin> list = service.searchCoinList();
-        String a = "";
-//        sendGet();
-//        sendPost();
-        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-        Scheduler scheduler = null;
-        try {
-            scheduler = schedulerFactory.getScheduler();
-            scheduler.shutdown();
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
+        sendGet();
+
     }
     private void sendGet(){
         try {
@@ -58,13 +51,13 @@ public class TickerJob implements Job {
             while ((jsonData = br.readLine()) != null) {
                 sb.append(jsonData);
             }
-            String a = sb.toString();
+            String response = sb.toString();
             Gson gson = new Gson();
-            a = a.replaceAll("\"pha\"\\:\\{","\"list\"\\:\\[\\{");
-            a = a.replaceAll("\"[a-zA-Z0-9]*\"\\:\\{","\\{");
-            a = a.replaceAll("\\}\\}","\\}\\]\\}");
-            TickerList list = gson.fromJson(a, TickerList.class);
-            System.out.println("test");
+            response= response.replaceAll("\"pha\"\\:\\{","\"list\"\\:\\[\\{");
+            response = response.replaceAll("\"[a-zA-Z0-9]*\"\\:\\{","\\{");
+            response = response.replaceAll("\\}\\}","\\}\\]\\}");
+            TickerList list = gson.fromJson(response, TickerList.class);
+            service.insertTicker(list);
         } catch (IOException e) {
             e.printStackTrace();
         }

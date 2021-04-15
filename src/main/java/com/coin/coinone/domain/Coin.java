@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class Coin {
-    private String key;
-    private String name;
+    private String currency;
+    private String coin_name;
     private String deal;
+    private String sec;
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.coin.coinone.dao.CoinDao"><!--namespace를 통해 UserDAO와 연결합니다. -->
+
+
+    <select id="searchCoinList" resultType="com.coin.coinone.domain.Coin">
+        SELECT currency,coin_NAME,deal,sec FROM coin_table
+    </select>
+    <insert id="insertItem" parameterType="com.coin.coinone.domain.Coin">
+        INSERT INTO coin_table
+        (`key`, `name`,`deal`)
+        VALUES
+        ('#{key}', '${name}','1')
+    </insert>
+    <insert id="insertTicker" parameterType="com.coin.coinone.domain.Ticker">
+        INSERT INTO ticker_table
+        (`currency`, `high`, `low`, `first`, `last`, `volume`, `time`)
+        VALUES
+        (#{currency},#{high},#{low},#{first},#{last},#{volume},#{timestamp})
+    </insert>
+</mapper>
