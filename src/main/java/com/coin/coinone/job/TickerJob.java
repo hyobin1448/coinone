@@ -1,7 +1,9 @@
 package com.coin.coinone.job;
 
 import com.coin.coinone.domain.Ticker;
+import com.coin.coinone.domain.TickerList;
 import com.coin.coinone.scheduler.TickerScheduler;
+import com.google.gson.Gson;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -33,7 +35,7 @@ public class TickerJob implements Job {
     }
     private void sendGet(){
         try {
-            URL url = new URL("https://api.coinone.co.kr/ticker/");
+            URL url = new URL("https://api.coinone.co.kr/ticker?currency=123");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             conn.setRequestProperty("Accept","application/json");
@@ -43,11 +45,16 @@ public class TickerJob implements Job {
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuffer sb = new StringBuffer();
             String jsonData;
-            while ((jsonData = br.readLine()) != null) {
+            while ((jsonData = br.readLine()) != null) {    
                 sb.append(jsonData);
             }
-            System.out.println(sb.toString());
-
+            String a = sb.toString();
+            Gson gson = new Gson();
+            a = a.replaceAll("\"pha\"\\:\\{","\"list\"\\:\\[\\{");
+            a = a.replaceAll("\"[a-zA-Z0-9]*\"\\:\\{","\\{");
+            a = a.replaceAll("\\}\\}","\\}\\]\\}");
+            TickerList list = gson.fromJson(a, TickerList.class);
+            System.out.println("test");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -11,5 +11,11 @@ public class Ticker {
     private String low;
     private String last;
     private String volume;
+    private String first;
+    private String currency;
+    private String timestamp;
 
+    public String getKey(){
+        return this.currency;
+    }
 }
