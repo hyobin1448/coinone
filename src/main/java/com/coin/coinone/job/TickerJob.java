@@ -34,10 +34,18 @@ public class TickerJob implements Job {
         String a = "";
 //        sendGet();
 //        sendPost();
+        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+        Scheduler scheduler = null;
+        try {
+            scheduler = schedulerFactory.getScheduler();
+            scheduler.shutdown();
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
     }
     private void sendGet(){
         try {
-            URL url = new URL("https://api.coinone.co.kr/ticker/");
+            URL url = new URL("https://api.coinone.co.kr/ticker?currency=123");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             conn.setRequestProperty("Accept","application/json");
@@ -50,8 +58,13 @@ public class TickerJob implements Job {
             while ((jsonData = br.readLine()) != null) {
                 sb.append(jsonData);
             }
-            System.out.println(sb.toString());
-
+            String a = sb.toString();
+            Gson gson = new Gson();
+            a = a.replaceAll("\"pha\"\\:\\{","\"list\"\\:\\[\\{");
+            a = a.replaceAll("\"[a-zA-Z0-9]*\"\\:\\{","\\{");
+            a = a.replaceAll("\\}\\}","\\}\\]\\}");
+            TickerList list = gson.fromJson(a, TickerList.class);
+            System.out.println("test");
         } catch (IOException e) {
             e.printStackTrace();
         }
