@@ -32,9 +32,32 @@ public class CoinService {
             int sec = map.get(item.getCurrency());
             if(Integer.parseInt(list.getSecond())%sec==0) {
                 item.setTimestamp(list.getTimestamp());
-                dao.insertTicker(item);
+                try {
+                    dao.insertTicker(item);
+                }catch (Exception ex){
+                    
+                }
+//                Ticker prvTicker = dao.searchTicker(item);
             }
         }
 
+    }
+    private void calcCCI(Ticker prvTicker, Ticker nowTicker){
+        double m = calcM(nowTicker);
+        double n = Double.parseDouble(dao.getCalcN(nowTicker));
+    }
+    private double calcM(Ticker ticker){
+        double high = Double.parseDouble(ticker.getHigh());
+        double low = Double.parseDouble(ticker.getLow());
+        double last = Double.parseDouble(ticker.getLast());
+
+        return (high+low+last)/3;
+    }
+    private double calcSM(Ticker ticker){
+        double high = Double.parseDouble(ticker.getHigh());
+        double low = Double.parseDouble(ticker.getLow());
+        double last = Double.parseDouble(ticker.getLast());
+
+        return (high+low+last)/3;
     }
 }

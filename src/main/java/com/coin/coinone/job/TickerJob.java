@@ -28,13 +28,11 @@ public class TickerJob {
     private ApplicationContext ctx;
     @Autowired
     private CoinService service;
-    @Scheduled(cron = "* */1 * * * ?")
+    @Scheduled(cron = "* */2 * * * ?")
     @Async
     public void start() throws JobExecutionException{
-
-        List<Coin> list = service.searchCoinList();
+//        List<Coin> list = service.searchCoinList();
         sendGet();
-
     }
     private void sendGet(){
         try {

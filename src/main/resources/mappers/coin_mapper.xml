@@ -16,8 +16,28 @@
     </insert>
     <insert id="insertTicker" parameterType="com.coin.coinone.domain.Ticker">
         INSERT INTO ticker_table
-        (`currency`, `high`, `low`, `first`, `last`, `volume`, `time`)
+        (`currency`, `high`, `low`, `first`, `last`, `volume`, `time`, `avg_move`, `avg_mean`)
         VALUES
-        (#{currency},#{high},#{low},#{first},#{last},#{volume},#{timestamp})
+        (#{currency},#{high},#{low},#{first},#{last},#{volume},#{timestamp},
+            (SELECT AVG((high+low+LAST)/3) avg_move FROM ticker_table a
+             WHERE STR_TO_DATE(time,'%Y-%m-%d %H:%i:%s') >= DATE_ADD(STR_TO_DATE(#{timestamp},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 HOUR)
+             AND currency=#{currency}),
+            (SELECT AVG(ABS(((high+low+LAST)/3)-avg_move)) avg_mean FROM ticker_table b
+             WHERE STR_TO_DATE(time,'%Y-%m-%d %H:%i:%s') >= DATE_ADD(STR_TO_DATE(#{timestamp},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 HOUR )
+             AND currency=#{currency})
+
+        )
+--             ((high+low+LAST)/3-avg_move)/(avg_mean*0.015) cci
+
     </insert>
+    <select id="searchTicker" resultType="com.coin.coinone.domain.Ticker">
+        SELECT high,low,last FROM ticker_table
+        WHERE currency = #{currency}
+        AND STR_TO_DATE(time,'%Y-%m-%d %H:%i:%s') = DATE_ADD(STR_TO_DATE(#{timestamp},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 MINUTE)
+    </select>
+    <select id="getCalcN" resultType="String">
+        SELECT AVG((high+low+LAST)/3) FROM ticker_table
+        WHERE currency = #{currency}
+        AND STR_TO_DATE(time,'%Y-%m-%d %H:%i:%s') >= DATE_ADD(STR_TO_DATE(#{timestamp},'%Y-%m-%d %H:%i:%s'),INTERVAL -1 MINUTE)
+    </select>
 </mapper>
